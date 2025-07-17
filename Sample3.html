@@ -1,0 +1,632 @@
+<?php
+if ($_SERVER["REQUEST_METHOD"] == "POST") {
+    // Collect all form data
+    $clientName = $_POST['clientName'];
+    $clientEmail = $_POST['clientEmail'];
+    $clientPhone = $_POST['clientPhone'];
+    $clientId = $_POST['clientId'];
+    $projectName = $_POST['projectName'];
+    $unitNumber = $_POST['unitNumber'];
+    $unitType = $_POST['unitType'];
+    $unitPrice = $_POST['unitPrice'];
+    $bookingStatus = $_POST['bookingStatus'];
+    $bookingDate = $_POST['bookingDate'];
+    $amountPaid = $_POST['amountPaid'];
+    $cancellationReason = $_POST['cancellationReason'];
+    $cancellationDetails = $_POST['cancellationDetails'];
+    $requestedDate = $_POST['requestedDate'];
+    $refundMethod = $_POST['refundMethod'];
+    $bankName = $_POST['bankName'];
+    $accountNumber = $_POST['accountNumber'];
+    $iban = $_POST['iban'];
+    
+    // Email configuration
+    $to = "clarice@obg.ae";
+    $subject = "Unit Cancellation Request from $clientName";
+    
+    // Email message
+    $message = "
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Unit Cancellation Form</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #818899 0%, #424242 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #000000, #424242);
+            color: white;
+            padding: 30px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grid" width="10" height="10" patternUnits="userSpaceOnUse"><path d="M 10 0 L 0 0 0 10" fill="none" stroke="rgba(255,255,255,0.1)" stroke-width="1"/></pattern></defs><rect width="100" height="100" fill="url(%23grid)" /></svg>');
+            opacity: 0.3;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .header p {
+            font-size: 1.1em;
+            opacity: 0.9;
+            position: relative;
+            z-index: 1;
+        }
+
+        .form-content {
+            padding: 40px;
+        }
+
+        .section {
+            margin-bottom: 30px;
+            padding: 25px;
+            background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+            border-radius: 15px;
+            border-left: 5px solid #424242;
+            transition: all 0.3s ease;
+        }
+
+        .section:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+        }
+
+        .section-title {
+            font-size: 1.4em;
+            color: #2c3e50;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .section-title::before {
+            content: '';
+            width: 8px;
+            height: 8px;
+            background: #424242;
+            border-radius: 50%;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #2c3e50;
+            font-size: 1.1em;
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 12px 16px;
+            border: 2px solid #e9ecef;
+            border-radius: 10px;
+            font-size: 1em;
+            transition: all 0.3s ease;
+            background: white;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: #424242;
+            box-shadow: 0 0 0 3px rgba(66, 66, 66, 0.1);
+            transform: translateY(-1px);
+        }
+
+        .form-group textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        .checkbox-group {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 15px;
+            padding: 12px;
+            background: rgba(66, 66, 66, 0.05);
+            border-radius: 8px;
+            transition: all 0.3s ease;
+        }
+
+        .checkbox-group:hover {
+            background: rgba(66, 66, 66, 0.1);
+        }
+
+        .checkbox-group input[type="checkbox"] {
+            width: 20px;
+            height: 20px;
+            accent-color: #424242;
+        }
+
+        .info-box {
+            background: linear-gradient(135deg, #f1f1f1, #e9ecef);
+            border: 1px solid #606060;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .info-box::before {
+            content: 'ℹ️';
+            font-size: 1.5em;
+            position: absolute;
+            top: 15px;
+            left: 15px;
+        }
+
+        .info-box-content {
+            margin-left: 40px;
+        }
+
+        .info-box h4 {
+            color: #424242;
+            margin-bottom: 10px;
+            font-size: 1.2em;
+        }
+
+        .penalty-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            background: white;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .penalty-table th,
+        .penalty-table td {
+            padding: 15px;
+            text-align: left;
+            border-bottom: 1px solid #e9ecef;
+        }
+
+        .penalty-table th {
+            background: linear-gradient(135deg, #424242, #606060);
+            color: white;
+            font-weight: 600;
+        }
+
+        .penalty-table tr:hover {
+            background: #f8f9fa;
+        }
+
+        .penalty-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        .submit-section {
+            text-align: center;
+            margin-top: 40px;
+            padding: 30px;
+            background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+            border-radius: 15px;
+        }
+
+        .submit-btn {
+            background: linear-gradient(135deg, #000000, #424242);
+            color: white;
+            border: none;
+            padding: 15px 40px;
+            font-size: 1.2em;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+        }
+
+        .submit-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.4);
+        }
+
+        .submit-btn:active {
+            transform: translateY(0);
+        }
+
+        .warning {
+            background: linear-gradient(135deg, #f1f1f1, #c0c1c4);
+            border: 1px solid #606060;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+            position: relative;
+        }
+
+        .warning::before {
+            content: '⚠️';
+            font-size: 1.5em;
+            position: absolute;
+            top: 15px;
+            left: 15px;
+        }
+
+        .warning-content {
+            margin-left: 40px;
+        }
+
+        @media (max-width: 768px) {
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+            
+            .container {
+                margin: 10px;
+            }
+            
+            .form-content {
+                padding: 20px;
+            }
+            
+            .header h1 {
+                font-size: 2em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div style="font-size: 1.8em; font-weight: bold; margin-bottom: 15px; letter-spacing: 2px;">
+                ONE BROKER GROUP
+            </div>
+            <h1>Unit Cancellation Request</h1>
+            <p>Please complete this form to cancel your unit booking or EOI</p>
+        </div>
+
+        <form class="form-content" id="cancellationForm">
+            <div class="section">
+                <h2 class="section-title">Client Information</h2>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="clientName">Full Name *</label>
+                        <input type="text" id="clientName" name="clientName" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="clientEmail">Email Address *</label>
+                        <input type="email" id="clientEmail" name="clientEmail" required>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="clientPhone">Phone Number *</label>
+                        <input type="tel" id="clientPhone" name="clientPhone" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="clientId">Client ID/Reference Number</label>
+                        <input type="text" id="clientId" name="clientId">
+                    </div>
+                </div>
+            </div>
+
+            <div class="section">
+                <h2 class="section-title">Unit Details</h2>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="projectName">Project Name *</label>
+                        <input type="text" id="projectName" name="projectName" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="unitNumber">Unit Number *</label>
+                        <input type="text" id="unitNumber" name="unitNumber" required>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="unitType">Unit Type</label>
+                        <select id="unitType" name="unitType">
+                            <option value="">Select Unit Type</option>
+                            <option value="studio">Studio</option>
+                            <option value="1br">1 Bedroom</option>
+                            <option value="2br">2 Bedroom</option>
+                            <option value="3br">3 Bedroom</option>
+                            <option value="penthouse">Penthouse</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="unitPrice">Unit Price (AED)</label>
+                        <input type="number" id="unitPrice" name="unitPrice" step="0.01">
+                    </div>
+                </div>
+            </div>
+
+            <div class="section">
+                <h2 class="section-title">Booking Status</h2>
+                <div class="form-group">
+                    <label for="bookingStatus">Current Booking Status *</label>
+                    <select id="bookingStatus" name="bookingStatus" required onchange="updateCancellationInfo()">
+                        <option value="">Select Status</option>
+                        <option value="eoi">Expression of Interest (EOI)</option>
+                        <option value="booking">Formal Booking</option>
+                    </select>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="bookingDate">Booking/EOI Date *</label>
+                        <input type="date" id="bookingDate" name="bookingDate" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="amountPaid">Amount Paid (AED)</label>
+                        <input type="number" id="amountPaid" name="amountPaid" step="0.01">
+                    </div>
+                </div>
+            </div>
+
+            <div class="section">
+                <h2 class="section-title">Cancellation Request</h2>
+                <div class="form-group">
+                    <label for="cancellationReason">Reason for Cancellation *</label>
+                    <select id="cancellationReason" name="cancellationReason" required>
+                        <option value="">Select Reason</option>
+                        <option value="financial">Financial Constraints</option>
+                        <option value="personal">Personal Circumstances</option>
+                        <option value="investment">Investment Change</option>
+                        <option value="property">Property Concerns</option>
+                        <option value="timeline">Timeline Issues</option>
+                        <option value="other">Other</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="cancellationDetails">Additional Details</label>
+                    <textarea id="cancellationDetails" name="cancellationDetails" placeholder="Please provide any additional information about your cancellation request..."></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="requestedDate">Requested Cancellation Date *</label>
+                    <input type="date" id="requestedDate" name="requestedDate" required>
+                </div>
+            </div>
+
+            <div id="cancellationInfo" class="section" style="display: none;">
+                <h2 class="section-title">Cancellation Terms & Conditions</h2>
+                
+                <div id="eoiInfo" style="display: none;">
+                    <div class="info-box">
+                        <div class="info-box-content">
+                            <h4>EOI Cancellation Policy</h4>
+                            <p><strong>Refund Policy:</strong> Full refund of EOI amount minus administrative fees</p>
+                            <p><strong>Administrative Fee:</strong> AED 500 (non-refundable)</p>
+                            <p><strong>Processing Time:</strong> 7-14 business days</p>
+                            <p><strong>Cancellation Timeline:</strong> Can be cancelled anytime before formal booking</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="bookingInfo" style="display: none;">
+                    <div class="warning">
+                        <div class="warning-content">
+                            <h4>Important Notice</h4>
+                            <p>Formal booking cancellations are subject to penalty fees as per the booking agreement. Please review the penalty structure below.</p>
+                        </div>
+                    </div>
+
+                    <h4>Penalty Structure for Formal Bookings</h4>
+                    <table class="penalty-table">
+                        <thead>
+                            <tr>
+                                <th>Cancellation Timeline</th>
+                                <th>Penalty</th>
+                                <th>Refund Amount</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Within 7 days of booking</td>
+                                <td>10% of total unit price</td>
+                                <td>90% of amount paid</td>
+                            </tr>
+                            <tr>
+                                <td>8-30 days after booking</td>
+                                <td>15% of total unit price</td>
+                                <td>85% of amount paid</td>
+                            </tr>
+                            <tr>
+                                <td>31-90 days after booking</td>
+                                <td>25% of total unit price</td>
+                                <td>75% of amount paid</td>
+                            </tr>
+                            <tr>
+                                <td>91-180 days after booking</td>
+                                <td>35% of total unit price</td>
+                                <td>65% of amount paid</td>
+                            </tr>
+                            <tr>
+                                <td>More than 180 days after booking</td>
+                                <td>50% of total unit price</td>
+                                <td>50% of amount paid</td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <div class="info-box">
+                        <div class="info-box-content">
+                            <h4>Refund Processing</h4>
+                            <p><strong>Processing Time:</strong> 21-45 business days after approval</p>
+                            <p><strong>Refund Method:</strong> Original payment method or bank transfer</p>
+                            <p><strong>Administrative Fee:</strong> AED 1,000 (non-refundable)</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="section">
+                <h2 class="section-title">Refund Information</h2>
+                <div class="form-group">
+                    <label for="refundMethod">Preferred Refund Method</label>
+                    <select id="refundMethod" name="refundMethod">
+                        <option value="original">Original Payment Method</option>
+                        <option value="bank">Bank Transfer</option>
+                        <option value="cheque">Cheque</option>
+                    </select>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="bankName">Bank Name (if applicable)</label>
+                        <input type="text" id="bankName" name="bankName">
+                    </div>
+                    <div class="form-group">
+                        <label for="accountNumber">Account Number (if applicable)</label>
+                        <input type="text" id="accountNumber" name="accountNumber">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="iban">IBAN (if applicable)</label>
+                    <input type="text" id="iban" name="iban">
+                </div>
+            </div>
+
+            <div class="section">
+                <h2 class="section-title">Acknowledgment</h2>
+                <div class="checkbox-group">
+                    <input type="checkbox" id="termsAccept" name="termsAccept" required>
+                    <label for="termsAccept">I understand and accept the cancellation terms and penalty structure as outlined above *</label>
+                </div>
+                <div class="checkbox-group">
+                    <input type="checkbox" id="refundAccept" name="refundAccept" required>
+                    <label for="refundAccept">I understand the refund processing timeline and acknowledge that refunds are subject to approval *</label>
+                </div>
+                <div class="checkbox-group">
+                    <input type="checkbox" id="finalDecision" name="finalDecision" required>
+                    <label for="finalDecision">I confirm that this cancellation request is final and cannot be reversed *</label>
+                </div>
+            </div>
+
+            <div class="submit-section">
+                <button type="submit" class="submit-btn">Submit Cancellation Request</button>
+                <p style="margin-top: 15px; color: #666;">
+                    Your cancellation request will be reviewed within 2-3 business days. You will receive a confirmation email once processed.
+                </p>
+            </div>
+        </form>
+    </div>
+
+    <script>
+        function updateCancellationInfo() {
+            const bookingStatus = document.getElementById('bookingStatus').value;
+            const cancellationInfo = document.getElementById('cancellationInfo');
+            const eoiInfo = document.getElementById('eoiInfo');
+            const bookingInfo = document.getElementById('bookingInfo');
+
+            if (bookingStatus === 'eoi') {
+                cancellationInfo.style.display = 'block';
+                eoiInfo.style.display = 'block';
+                bookingInfo.style.display = 'none';
+            } else if (bookingStatus === 'booking') {
+                cancellationInfo.style.display = 'block';
+                eoiInfo.style.display = 'none';
+                bookingInfo.style.display = 'block';
+            } else {
+                cancellationInfo.style.display = 'none';
+            }
+        }
+
+        document.getElementById('cancellationForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            // Basic validation
+            const requiredFields = this.querySelectorAll('input[required], select[required]');
+            let isValid = true;
+            
+            requiredFields.forEach(field => {
+                if (!field.value.trim()) {
+                    isValid = false;
+                    field.style.borderColor = '#ff6b6b';
+                } else {
+                    field.style.borderColor = '#e9ecef';
+                }
+            });
+            
+            if (isValid) {
+                alert('Your cancellation request has been submitted successfully. You will receive a confirmation email shortly.');
+                // Here you would typically send the data to your server
+            } else {
+                alert('Please fill in all required fields.');
+            }
+        });
+
+        // Add smooth animations
+        document.querySelectorAll('.section').forEach(section => {
+            section.addEventListener('mouseenter', function() {
+                this.style.transform = 'translateY(-2px)';
+            });
+            
+            section.addEventListener('mouseleave', function() {
+                this.style.transform = 'translateY(0)';
+            });
+        });
+    </script>
+</body>
+</html>
+";
+    
+    // Headers
+    $headers = "MIME-Version: 1.0\r\n";
+    $headers .= "Content-type: text/html; charset=UTF-8\r\n";
+    $headers .= "From: $clientEmail\r\n";
+    $headers .= "Reply-To: $clientEmail\r\n";
+    
+    // Send email
+    if (mail($to, $subject, $message, $headers)) {
+        // Redirect to thank you page
+        header("file:///C:/Users/OBG/Downloads/Sample2.html");
+    } else {
+        echo "Error sending email. Please try again later.";
+    }
+} else {
+    // Not a POST request, redirect to form
+    header("C:\Users\OBG\Downloads: Sample2.txt");
+}
+?>
